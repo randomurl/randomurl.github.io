@@ -71,10 +71,10 @@ function createurl() {
 
 function docreateurl() {
   createurl();
-  setTimeout(createurl, 25);
+  setTimeout(createurl, 10);
 }
 
-$("#urlsarea").on('change keyup paste',createurl);
+$("#urlsarea").on('change keyup paste',docreateurl);
 }
 $(document).ready(everything)
 
