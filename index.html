@@ -63,33 +63,58 @@
 
       function everything() {
 
-      function createurl() {
-        // Process 
-        var rawurls = $("#urlsarea")[0].value.trim();
-        var list = rawurls.split(/\n/).filter(function (e) {
-          return e.trim().length !== 0;
-        }).map(function(e){return e.trim()});
-        var output = list.join("\n");
-        output = encodeURIComponent(btoa(output));
-        // Create link
-        $("#shortlink")[0].value = "https://randomurl.github.io/?v="+output
-        // Show list
-        $("#thelist").empty();
-        list.map(function(url) {
-          $("#thelist").append(
-            $("<li>").append(
-              $("<a>").attr('href',url).append(document.createTextNode(url))
-            )
-          );
-        });
-      }
+        function createurl() {
+          // Process 
+          var rawurls = $("#urlsarea")[0].value.trim();
+          var list = rawurls.split(/\n/).filter(function (e) {
+            return e.trim().length !== 0;
+          }).map(function(e){return e.trim()});
+          var output = list.join("\n");
+          output = encodeURIComponent(btoa(output));
+          // Create link
+          $("#shortlink")[0].value = "https://randomurl.github.io/" + (output.length !== 0 ? "?v="+output : "");
+          // Show list
+          $("#thelist").empty();
+          list.map(function(url) {
+            $("#thelist").append(
+              $("<li>").append(
+                $("<a>").attr('href',url).append(document.createTextNode(url))
+              )
+            );
+          });
+        }
 
-      function docreateurl() {
-        createurl();
-        setTimeout(createurl, 10);
-      }
+        function reverselookup() {
+          var data = gup('v', $("#shortlink").val());
+          if(data) {
+            var rawstring = atob(decodeURIComponent(data));
+            $("#urlsarea").val(rawstring);
+            var list = rawstring.split(/\n/);
+            $("#thelist").empty();
+            list.map(function(url) {
+              $("#thelist").append(
+                $("<li>").append(
+                  $("<a>").attr('href',url).append(document.createTextNode(url))
+                )
+              );
+            });
+          }
+        }
 
-      $("#urlsarea").on('change keyup paste',docreateurl);
+        function docreateurl() {
+          createurl();
+          setTimeout(createurl, 10);
+        }
+
+        function doreverselookup() {
+          reverselookup();
+          setTimeout(reverselookup, 10);
+        }
+
+        $("#urlsarea").on('change keyup paste',docreateurl);
+
+        $("#shortlink").on('change keyup paste',doreverselookup);
+
       }
       $(document).ready(everything)
 
@@ -97,14 +122,15 @@
   </head>
   <body> 
     <h3>Enter each url on a new line</h3>
-    <textarea id="urlsarea" rows=10 cols=50></textarea><br/><br/>
-    <input id="shortlink" value="https://randomurl.github.io" size="50" readonly>
+    <textarea id="urlsarea" rows=10 cols=50></textarea><br/>
+    <h3>Copy link below</h3>
+    <p>Or paste another <code>randomurl.github.io</code> link for a <code>reverse lookup</code></p>
+    <input id="shortlink" value="https://randomurl.github.io" size="50">
     <!-- Trigger -->
     <button class="btn" data-clipboard-target="#shortlink">
         Copy to clipboard
     </button><br/>
-    <p>Anyone who navigates to this link will be redirected to one of the below sites</p>
-    <h4>List:</h4>
+    <p>Following the above link will randomly redirect to one of the URLs below:</p>
     <ol id="thelist">
     </ol>
   </body>
